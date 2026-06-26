@@ -14,8 +14,8 @@ export const developerInfo = {
     "MERN Stack Developer",
     "React Specialist",
   ],
-  avatar: "",       // Hero section photo — set via Admin Panel
-  aboutAvatar: "",  // About section photo — set via Admin Panel
+  avatar: "/project-images/5376f0f1-5fca-45f8-b2a8-dc1507a808ed.png",       // Hero section photo — set via Admin Panel
+  aboutAvatar: "/project-images/c641de2e-632f-4c91-ada6-4c4a7c6ca165.png",  // About section photo — set via Admin Panel
   email: "as3085034@gmail.com",
   phone: "9322955167",
   address: "Nashik, Maharastra, India",

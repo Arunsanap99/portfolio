@@ -8,6 +8,9 @@ import {
   getSkills,
   getProjects,
   getExperience,
+  exportData,
+  importData,
+  uploadFileToFirebase,
 } from '../store/portfolioStore';
 import { compressImage } from '../utils/utils';
 
@@ -105,6 +108,13 @@ function LoginScreen({ onLogin }) {
 
 // ─── PROFILE SECTION ─────────────────────────────────────────────────────────
 function ProfileEditor({ setActiveTab }) {
+  const showExternalUrlGuide = (
+    <div className="bg-blue-950/50 border border-blue-500/30 rounded-xl p-3 mb-4 space-y-1 text-xs text-blue-200">
+      <p className="font-bold text-blue-400">🚀 IMPORTANT FOR DEPLOYED LINK!</p>
+      <p>For your photos to show up on your deployed portfolio, <strong>use a public external image URL</strong> instead of uploading directly!</p>
+      <p><strong>How to get an image URL:</strong> Use free sites like <a href="https://imgur.com" target="_blank" rel="noreferrer" className="underline">Imgur</a>, <a href="https://postimages.org" target="_blank" rel="noreferrer" className="underline">PostImages</a>, or <a href="https://cloudinary.com" target="_blank" rel="noreferrer" className="underline">Cloudinary</a> to host your photo, then copy the direct image link!</p>
+    </div>
+  );
   const info = getDeveloperInfo();
   const [form, setForm] = useState({
     name: info.name,
@@ -127,17 +137,24 @@ function ProfileEditor({ setActiveTab }) {
   const [saved, setSaved] = useState(false);
   const [previewHero, setPreviewHero] = useState(info.avatar);
   const [previewAbout, setPreviewAbout] = useState(info.aboutAvatar || '');
+  const [isUploadingHero, setIsUploadingHero] = useState(false);
+  const [isUploadingAbout, setIsUploadingAbout] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const handleImageUpload = (field, setPreview) => (e) => {
+  const handleImageUpload = (field, setPreview, setIsUploading) => (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
+    setIsUploading(true);
+    
+    // Show preview and set data URL locally
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target.result;
       setPreview(dataUrl);
       set(field, dataUrl);
+      setIsUploading(false);
     };
     reader.readAsDataURL(file);
   };
@@ -175,6 +192,7 @@ function ProfileEditor({ setActiveTab }) {
 
   return (
     <Card title="Profile Information">
+      {showExternalUrlGuide}
       {/* Two separate photo uploads */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Hero Photo */}
@@ -188,8 +206,8 @@ function ProfileEditor({ setActiveTab }) {
             )}
           </div>
           <label className="cursor-pointer block w-full text-center px-3 py-2 bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/40 text-violet-300 text-sm rounded-xl transition-colors font-semibold">
-            📷 Upload Hero Photo
-            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload('avatar', setPreviewHero)} />
+            {isUploadingHero ? '⏳ Uploading...' : '📷 Upload Hero Photo'}
+            <input type="file" accept="image/*" className="hidden" disabled={isUploadingHero} onChange={handleImageUpload('avatar', setPreviewHero, setIsUploadingHero)} />
           </label>
           <input
             type="text"
@@ -211,8 +229,8 @@ function ProfileEditor({ setActiveTab }) {
             )}
           </div>
           <label className="cursor-pointer block w-full text-center px-3 py-2 bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-500/40 text-cyan-300 text-sm rounded-xl transition-colors font-semibold">
-            📷 Upload About Photo
-            <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload('aboutAvatar', setPreviewAbout)} />
+            {isUploadingAbout ? '⏳ Uploading...' : '📷 Upload About Photo'}
+            <input type="file" accept="image/*" className="hidden" disabled={isUploadingAbout} onChange={handleImageUpload('aboutAvatar', setPreviewAbout, setIsUploadingAbout)} />
           </label>
           <input
             type="text"
@@ -283,10 +301,19 @@ function ProfileEditor({ setActiveTab }) {
 
 // ─── RESUME SECTION ──────────────────────────────────────────────────────────
 function ResumeEditor() {
+  const showResumeUrlGuide = (
+    <div className="bg-blue-950/50 border border-blue-500/30 rounded-xl p-3 mb-4 space-y-1 text-xs text-blue-200">
+      <p className="font-bold text-blue-400">🚀 IMPORTANT FOR DEPLOYED LINK!</p>
+      <p>For your resume to show up on your deployed portfolio, <strong>use a public external PDF URL</strong> instead of uploading directly!</p>
+      <p><strong>How to get a PDF URL:</strong> Upload your PDF to <a href="https://drive.google.com" target="_blank" rel="noreferrer" className="underline">Google Drive</a>, <a href="https://www.dropbox.com" target="_blank" rel="noreferrer" className="underline">Dropbox</a>, or <a href="https://cloudinary.com" target="_blank" rel="noreferrer" className="underline">Cloudinary</a>, then copy the direct PDF link!</p>
+    </div>
+  );
+  
   const info = getDeveloperInfo();
   const [resumeUrl, setResumeUrl] = useState(info.resumeUrl || '');
   const [saved, setSaved] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
 
   const handlePdfUpload = (e) => {
     const file = e.target.files[0];
@@ -300,9 +327,14 @@ function ResumeEditor() {
       return;
     }
     setUploadError('');
+    setIsUploadingResume(true);
+    
+    // Show local preview and save data URL
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setResumeUrl(ev.target.result);
+      const dataUrl = ev.target.result;
+      setResumeUrl(dataUrl);
+      setIsUploadingResume(false);
     };
     reader.readAsDataURL(file);
   };
@@ -327,6 +359,7 @@ function ResumeEditor() {
   return (
     <Card title="Resume Management">
       <div className="space-y-6">
+        {showResumeUrlGuide}
         {/* Help Banner */}
         <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 text-xs text-slate-400 leading-relaxed">
           💡 Your resume can be configured in two ways:
@@ -356,9 +389,9 @@ function ResumeEditor() {
                 : 'border-slate-700 hover:border-violet-500/50 bg-slate-900 hover:bg-slate-800/40'
             }`}>
               <div className="text-center space-y-2">
-                <span className="text-3xl">{isBase64 ? '📄' : '📤'}</span>
+                <span className="text-3xl">{isUploadingResume ? '⏳' : (isBase64 ? '📄' : '📤')}</span>
                 <p className="text-sm font-bold text-white">
-                  {isBase64 ? 'Resume PDF Uploaded' : 'Select PDF File'}
+                  {isUploadingResume ? 'Uploading Resume...' : (isBase64 ? 'Resume PDF Uploaded' : 'Select PDF File')}
                 </p>
                 <p className="text-xs text-slate-500">
                   {isBase64 ? `File size: ~${base64Size} KB` : 'PDF files only, max 1.2MB'}
@@ -368,6 +401,7 @@ function ResumeEditor() {
                 type="file"
                 accept="application/pdf"
                 className="hidden"
+                disabled={isUploadingResume}
                 onChange={handlePdfUpload}
               />
             </label>
@@ -540,8 +574,17 @@ function SkillsEditor() {
 
 // ─── PROJECTS SECTION ─────────────────────────────────────────────────────────
 function ProjectsEditor() {
+  const showProjectUrlGuide = (
+    <div className="bg-blue-950/50 border border-blue-500/30 rounded-xl p-3 mb-4 space-y-1 text-xs text-blue-200">
+      <p className="font-bold text-blue-400">🚀 IMPORTANT FOR DEPLOYED LINK!</p>
+      <p>For your project images to show up on your deployed portfolio, <strong>use a public external image URL</strong> instead of uploading directly!</p>
+      <p><strong>How to get an image URL:</strong> Use free sites like <a href="https://imgur.com" target="_blank" rel="noreferrer" className="underline">Imgur</a>, <a href="https://postimages.org" target="_blank" rel="noreferrer" className="underline">PostImages</a>, or <a href="https://cloudinary.com" target="_blank" rel="noreferrer" className="underline">Cloudinary</a> to host your photo, then copy the direct image link!</p>
+    </div>
+  );
+  
   const [projects, setProjects] = useState(() => getProjects());
   const [saved, setSaved] = useState(false);
+  const [isUploadingProjects, setIsUploadingProjects] = useState({}); // { [idx]: boolean }
 
   const update = (idx, field, val) => {
     setProjects(prev => prev.map((p, i) => i === idx ? { ...p, [field]: val } : p));
@@ -550,8 +593,29 @@ function ProjectsEditor() {
   const handleProjImageUpload = (idx) => (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    compressImage(file, (dataUrl) => {
+    
+    setIsUploadingProjects(prev => ({ ...prev, [idx]: true }));
+    
+    // Compress image first
+    compressImage(file, async (dataUrl) => {
+      // First set preview
       update(idx, 'image', dataUrl);
+      
+      // Now upload to Firebase
+      try {
+        const path = `portfolio/projects/${Date.now()}-${file.name}`;
+        // Convert dataUrl to File object
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const newFile = new File([blob], file.name, { type: file.type });
+        const downloadURL = await uploadFileToFirebase(newFile, path);
+        update(idx, 'image', downloadURL);
+      } catch (err) {
+        console.error('Failed to upload project image:', err);
+        alert('Failed to upload image. Please try again or use an image URL.');
+      } finally {
+        setIsUploadingProjects(prev => ({ ...prev, [idx]: false }));
+      }
     });
   };
 
@@ -582,6 +646,7 @@ function ProjectsEditor() {
 
   return (
     <Card title="Projects">
+      {showProjectUrlGuide}
       <div className="space-y-6">
         {projects.map((proj, idx) => (
           <div key={proj.id} className="bg-slate-800/60 rounded-2xl p-4 space-y-3 border border-slate-700/60">
@@ -604,8 +669,8 @@ function ProjectsEditor() {
                     </div>
                   )}
                   <label className="cursor-pointer flex-1 text-center py-2 bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/40 text-violet-300 text-xs rounded-xl transition-colors font-semibold">
-                    📷 Upload Image
-                    <input type="file" accept="image/*" className="hidden" onChange={handleProjImageUpload(idx)} />
+                    {isUploadingProjects[idx] ? '⏳ Uploading...' : '📷 Upload Image'}
+                    <input type="file" accept="image/*" className="hidden" disabled={isUploadingProjects[idx]} onChange={handleProjImageUpload(idx)} />
                   </label>
                   {proj.image && (
                     <button
@@ -655,16 +720,25 @@ function ExperienceEditor() {
   const handleExpFileUpload = (idx, field) => (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
+    const processAndSave = (fileObj, dataUrl = null) => {
+      if (dataUrl) {
+        update(idx, field, dataUrl);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          update(idx, field, ev.target.result);
+        };
+        reader.readAsDataURL(fileObj);
+      }
+    };
+    
     if (file.type.startsWith('image/')) {
       compressImage(file, (dataUrl) => {
-        update(idx, field, dataUrl);
+        processAndSave(file, dataUrl);
       });
     } else {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        update(idx, field, ev.target.result);
-      };
-      reader.readAsDataURL(file);
+      processAndSave(file);
     }
   };
 
@@ -851,12 +925,38 @@ export default function AdminPanel() {
             <p className="text-xs text-slate-500 mt-0.5">Manage your portfolio content</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/')}
             className="text-xs font-semibold text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 hover:border-slate-500 transition-colors"
           >
             ← View Site
+          </button>
+          <label className="cursor-pointer text-xs font-semibold text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 hover:border-slate-500 transition-colors">
+            📥 Import
+            <input
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  try {
+                    await importData(file);
+                    alert('Data imported successfully!');
+                  } catch (err) {
+                    alert('Failed to import data: ' + err.message);
+                  }
+                  e.target.value = '';
+                }
+              }}
+            />
+          </label>
+          <button
+            onClick={exportData}
+            className="text-xs font-semibold text-green-400 hover:text-green-300 px-3 py-1.5 rounded-lg border border-green-500/30 hover:border-green-400/60 transition-colors"
+          >
+            📤 Export
           </button>
           <button
             onClick={handleReset}
@@ -892,9 +992,19 @@ export default function AdminPanel() {
         </div>
 
         {/* Info Banner */}
-        <div className="bg-violet-500/10 border border-violet-500/20 rounded-2xl px-5 py-3 text-sm text-violet-300 flex items-start gap-2">
-          <span className="text-base mt-0.5">💾</span>
-          <span>All changes are <strong>auto-saved to your browser</strong>. They will persist even after closing the tab. Use <strong>Reset All</strong> to go back to defaults.</span>
+        <div className="bg-violet-500/10 border border-violet-500/20 rounded-2xl px-5 py-4 text-sm text-violet-300 space-y-2">
+          <div className="flex items-start gap-2">
+            <span className="text-base mt-0.5">💾</span>
+            <span>All changes are <strong>auto-saved to your browser</strong>. They will persist even after closing the tab. Use <strong>Reset All</strong> to go back to defaults.</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-base mt-0.5">📤</span>
+            <span>Use <strong>Export</strong> to download your data as a JSON file, then <strong>Import</strong> on other devices to sync changes.</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-base mt-0.5">🌐</span>
+            <span>For images/resume to work across all devices, use <strong>public external URLs</strong> (e.g., Google Drive, Dropbox, Imgur, etc.) instead of local file uploads.</span>
+          </div>
         </div>
 
         {/* Tab Content */}

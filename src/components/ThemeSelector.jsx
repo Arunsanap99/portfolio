@@ -14,7 +14,7 @@ const themes = [
 export default function ThemeSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTheme, setActiveTheme] = useState(() => {
-    return localStorage.getItem('portfolio-theme') || 'theme-purple';
+    return localStorage.getItem('portfolio-theme') || 'theme-rose';
   });
 
   useEffect(() => {
