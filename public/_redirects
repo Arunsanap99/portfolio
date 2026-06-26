@@ -1,0 +1,5 @@
+# Serve static assets (images, fonts, etc.) directly — don't redirect them
+/project-images/*  /project-images/:splat  200
+
+# SPA fallback for all other routes
+/*    /index.html   200
