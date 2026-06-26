@@ -1,5 +1,8 @@
 # ⚡ Premium Interactive MERN Stack Developer Portfolio
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/999c7d0d-959c-4ca8-bb41-86a074091dfc/deploy-status)](https://arunsanap.netlify.app)
+> **Live Site:** [arunsanap.netlify.app](https://arunsanap.netlify.app)
+
 A high-performance, visually stunning, and interactive 3D portfolio website custom-tailored for a **Full Stack MERN Developer**. It features a modern dark aesthetic, smooth scroll physics, custom canvas particles, real-time email routing, an AI-powered query chatbot, and an integrated local Admin Panel.
 
 ---
