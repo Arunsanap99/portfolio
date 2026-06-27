@@ -710,6 +710,14 @@ function ProjectsEditor() {
 
 // ─── EXPERIENCE / CERTIFICATES ───────────────────────────────────────────────
 function ExperienceEditor() {
+  const showExperienceUrlGuide = (
+    <div className="bg-blue-950/50 border border-blue-500/30 rounded-xl p-3 mb-4 space-y-1 text-xs text-blue-200">
+      <p className="font-bold text-blue-400">🚀 IMPORTANT FOR DEPLOYED LINK!</p>
+      <p>For your certificates/files to show up on your deployed portfolio, <strong>use public external URLs</strong> instead of uploading directly!</p>
+      <p><strong>How to get a URL:</strong> Upload to <a href="https://drive.google.com" target="_blank" rel="noreferrer" className="underline">Google Drive</a>, <a href="https://www.dropbox.com" target="_blank" rel="noreferrer" className="underline">Dropbox</a>, or <a href="https://cloudinary.com" target="_blank" rel="noreferrer" className="underline">Cloudinary</a>, then copy the direct link!</p>
+    </div>
+  );
+  
   const [items, setItems] = useState(() => getExperience());
   const [saved, setSaved] = useState(false);
 
@@ -777,6 +785,7 @@ function ExperienceEditor() {
 
   return (
     <Card title="Experience & Certifications">
+      {showExperienceUrlGuide}
       <div className="space-y-4">
         {items.map((item, idx) => (
           <div key={item.id} className="bg-slate-800/60 rounded-2xl p-4 space-y-3 border border-slate-700/60">
