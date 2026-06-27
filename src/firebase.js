@@ -10,7 +10,8 @@ const firebaseConfig = {
   storageBucket: "practicalshare.firebasestorage.app",
   messagingSenderId: "445035892666",
   appId: "1:445035892666:web:3ba42403f56463748f9783",
-  measurementId: "G-Z68Q3R0Y2Z"
+  measurementId: "G-Z68Q3R0Y2Z",
+  databaseURL: "https://practicalshare-default-rtdb.firebaseio.com"
 };
 
 // Initialize Firebase

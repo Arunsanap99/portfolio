@@ -89,16 +89,6 @@ export const skills = [
 export const experience = [
   {
     id: 7,
-    title: "JPT Internship",
-    subtitle: "Jainemo Private Limited",
-    date: "2026",
-    description: "Completed internship at Jainemo Private Limited.",
-    type: "certification",
-    image: "https://drive.google.com/uc?export=view&id=1u3HRzdYFtxsU44ZCQX52o5Ce1bpSP9Zv",
-    file: "https://drive.google.com/uc?export=download&id=1u3HRzdYFtxsU44ZCQX52o5Ce1bpSP9Zv"
-  },
-  {
-    id: 8,
     title: "Career Readiness Job Skill Training",
     subtitle: "WNS Global Services / MakeMyCareer@WCF",
     date: "Jul 2024",
@@ -146,6 +136,8 @@ export const experience = [
     date: "Dec 2025 - Apr 2026",
     description: "Mentored 5,000+ students, resolved 613+ doubts with a 4.62/5.00 average feedback rating. Guided student learning and conducted code reviews under the supervision of Ms. Khyati.",
     type: "internship",
+    image: "",
+    file: "https://drive.google.com/file/d/1u3HRzdYFtxsU44ZCQX52o5Ce1bpSP9Zv/view",
     certificateInfo: {
       template: "jainemo",
       provider: "Jainemo Private Limited",

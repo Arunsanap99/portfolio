@@ -11,6 +11,7 @@ import {
   exportData,
   importData,
   uploadFileToFirebase,
+  isFirebaseEnabled,
 } from '../store/portfolioStore';
 import { compressImage } from '../utils/utils';
 
@@ -150,10 +151,21 @@ function ProfileEditor({ setActiveTab }) {
     
     // Show preview and set data URL locally
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const dataUrl = ev.target.result;
       setPreview(dataUrl);
       set(field, dataUrl);
+
+      if (isFirebaseEnabled) {
+        try {
+          const path = `portfolio/profile/${Date.now()}-${file.name}`;
+          const downloadURL = await uploadFileToFirebase(file, path);
+          setPreview(downloadURL);
+          set(field, downloadURL);
+        } catch (err) {
+          console.error('Failed to upload image to Firebase:', err);
+        }
+      }
       setIsUploading(false);
     };
     reader.readAsDataURL(file);
@@ -322,8 +334,9 @@ function ResumeEditor() {
       setUploadError('❌ Only PDF files are supported.');
       return;
     }
-    if (file.size > 1.2 * 1024 * 1024) {
-      setUploadError('❌ File size exceeds 1.2MB. Please compress your PDF to save it.');
+    const maxLimit = isFirebaseEnabled ? 5 * 1024 * 1024 : 1.2 * 1024 * 1024;
+    if (file.size > maxLimit) {
+      setUploadError(`❌ File size exceeds ${isFirebaseEnabled ? '5MB' : '1.2MB'}. Please compress your PDF.`);
       return;
     }
     setUploadError('');
@@ -331,9 +344,20 @@ function ResumeEditor() {
     
     // Show local preview and save data URL
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const dataUrl = ev.target.result;
       setResumeUrl(dataUrl);
+
+      if (isFirebaseEnabled) {
+        try {
+          const path = `portfolio/resume/${Date.now()}-${file.name}`;
+          const downloadURL = await uploadFileToFirebase(file, path);
+          setResumeUrl(downloadURL);
+        } catch (err) {
+          console.error('Failed to upload PDF to Firebase:', err);
+          setUploadError('❌ Failed to upload to cloud storage.');
+        }
+      }
       setIsUploadingResume(false);
     };
     reader.readAsDataURL(file);
@@ -355,6 +379,11 @@ function ResumeEditor() {
 
   const isBase64 = resumeUrl.startsWith('data:application/pdf');
   const base64Size = isBase64 ? Math.round((resumeUrl.length * 3) / 4 / 1024) : 0;
+  const canPreview = isBase64 || 
+    (typeof resumeUrl === 'string' && (
+      resumeUrl.includes('firebasestorage.googleapis.com') || 
+      resumeUrl.split('?')[0].endsWith('.pdf')
+    ));
 
   return (
     <Card title="Resume Management">
@@ -438,7 +467,7 @@ function ResumeEditor() {
           <div className="space-y-2">
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Live Preview</p>
             <div className="rounded-2xl overflow-hidden border border-slate-800 h-[450px] bg-slate-900 relative">
-              {isBase64 ? (
+              {canPreview ? (
                 <iframe src={resumeUrl} title="Resume Live Preview" className="w-full h-full border-0" />
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 space-y-3">
@@ -729,13 +758,37 @@ function ExperienceEditor() {
     const file = e.target.files[0];
     if (!file) return;
     
-    const processAndSave = (fileObj, dataUrl = null) => {
+    const processAndSave = async (fileObj, dataUrl = null) => {
       if (dataUrl) {
         update(idx, field, dataUrl);
+        
+        if (isFirebaseEnabled) {
+          try {
+            const path = `portfolio/experience/${Date.now()}-${fileObj.name}`;
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
+            const newFile = new File([blob], fileObj.name, { type: fileObj.type });
+            const downloadURL = await uploadFileToFirebase(newFile, path);
+            update(idx, field, downloadURL);
+          } catch (err) {
+            console.error('Failed to upload experience image:', err);
+          }
+        }
       } else {
         const reader = new FileReader();
-        reader.onload = (ev) => {
-          update(idx, field, ev.target.result);
+        reader.onload = async (ev) => {
+          const localUrl = ev.target.result;
+          update(idx, field, localUrl);
+          
+          if (isFirebaseEnabled) {
+            try {
+              const path = `portfolio/experience/${Date.now()}-${fileObj.name}`;
+              const downloadURL = await uploadFileToFirebase(fileObj, path);
+              update(idx, field, downloadURL);
+            } catch (err) {
+              console.error('Failed to upload experience file:', err);
+            }
+          }
         };
         reader.readAsDataURL(fileObj);
       }

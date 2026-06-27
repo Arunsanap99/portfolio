@@ -295,7 +295,10 @@ export default function Experience() {
                   
                   {/* ────────────────── CUSTOM UPLOADED FILE (PDF/Doc) ────────────────── */}
                   {activeCert.file && (() => {
-                    const isExternal = typeof activeCert.file === 'string' && (activeCert.file.startsWith('http://') || activeCert.file.startsWith('https://'));
+                    const isExternal = typeof activeCert.file === 'string' && 
+                      (activeCert.file.startsWith('http://') || activeCert.file.startsWith('https://')) &&
+                      !activeCert.file.includes('firebasestorage.googleapis.com') && 
+                      !activeCert.file.split('?')[0].endsWith('.pdf');
                     return isExternal ? (
                       <div className="certificate-card w-full h-[65vh] bg-stone-950 p-1 rounded-3xl border border-stone-800 shadow-2xl max-w-3xl mx-auto relative overflow-hidden flex items-center justify-center">
                         <div className="flex flex-col items-center justify-center text-center p-8 space-y-4">

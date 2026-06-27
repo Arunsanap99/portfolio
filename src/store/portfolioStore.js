@@ -21,7 +21,7 @@ const DATA_KEY = 'admin_data';
 
 let db = null;
 let globalStore = {};
-let isFirebaseEnabled = false; // Set to false if you don't want to use Firebase
+export let isFirebaseEnabled = true; // Set to false if you don't want to use Firebase
 
 // Fallback to localStorage data if it exists, to migrate user's existing data
 function getLocalStorageStore() {
