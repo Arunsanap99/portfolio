@@ -20,7 +20,7 @@ export const developerInfo = {
   phone: "9322955167",
   address: "Nashik, Maharastra, India",
   about: "I am a passionate MERN Stack Developer. I build high-performance, responsive, and visually stunning web applications with modern design semantics. Currently expanding my horizons in AI integrations and building interactive 3D web experiences.",
-  resumeUrl: "https://drive.google.com/uc?export=view&id=15bY9tUs8XIu1m0mhbX9zMSKh-F-TPIN5", // User can upload / link their PDF here
+  resumeUrl: "https://drive.google.com/uc?export=download&id=15bY9tUs8XIu1m0mhbX9zMSKh-F-TPIN5", // User can upload / link their PDF here
   socials: {
     github: "https://github.com/Arunsanap99",
     linkedin: "https://www.linkedin.com/in/arun-sanap-37781228b/",
@@ -88,17 +88,17 @@ export const skills = [
 
 export const experience = [
   {
-    id: 8,
-    title: "New Certificate",
-    subtitle: "Certificate Provider",
+    id: 7,
+    title: "JPT Internship",
+    subtitle: "Jainemo Private Limited",
     date: "2026",
-    description: "This is your new certificate! You can update the title, subtitle, description, and date in the Admin Panel.",
+    description: "Completed internship at Jainemo Private Limited.",
     type: "certification",
     image: "https://drive.google.com/uc?export=view&id=1u3HRzdYFtxsU44ZCQX52o5Ce1bpSP9Zv",
-    file: "https://drive.google.com/uc?export=view&id=1u3HRzdYFtxsU44ZCQX52o5Ce1bpSP9Zv"
+    file: "https://drive.google.com/uc?export=download&id=1u3HRzdYFtxsU44ZCQX52o5Ce1bpSP9Zv"
   },
   {
-    id: 7,
+    id: 8,
     title: "Career Readiness Job Skill Training",
     subtitle: "WNS Global Services / MakeMyCareer@WCF",
     date: "Jul 2024",
